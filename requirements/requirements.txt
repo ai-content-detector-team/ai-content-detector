@@ -1,0 +1,13 @@
+transformers
+spacy==3.7.*
+language_tool_python
+pyspellchecker
+numpy
+pandas
+matplotlib
+seaborn
+wordcloud
+nltk
+scikit-learn
+scipy
+tqdm
