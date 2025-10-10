@@ -1,3 +1,11 @@
 fastapi
 uvicorn
 pydantic
+pandas
+numpy
+spacy
+nltk
+transformers
+scikit-learn
+xgboost
+mlflow
