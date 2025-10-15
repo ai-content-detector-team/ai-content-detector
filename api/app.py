@@ -14,6 +14,7 @@ import spacy
 import nltk
 from nltk.corpus import stopwords
 from transformers import AutoTokenizer
+import os
 
 
 
@@ -129,8 +130,8 @@ tokenizer = None
 model = None
 
 #MLflow
-MLFLOW_TRACKING_URI = "https://name-space_name.hf.space"
-MODEL_URI = "models:/name_model/number_version"
+MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI")
+MODEL_URI = os.environ.get("MODEL_URI")
 
 #Configuration
 STOPWORDS_LANGUAGE = "english"
@@ -321,7 +322,7 @@ def preprocessor(text):
     #Ajouter toutes les catégories (même si 0)
     for cat in connectives.keys():
         key = f"connective_{cat}_ratio"
-        features['key'] = connective_features.get(key, 0.0)
+        features[key] = connective_features.get(key, 0.0)
 
     # === 6. POS tags ===
     pos_feat = pos_features(doc, len_words)

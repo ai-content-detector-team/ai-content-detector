@@ -20,9 +20,9 @@ os.environ["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID")
 os.environ["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY")
 os.environ["MLFLOW_S3_ENDPOINT_URL"] = "https://s3.eu-west-3.amazonaws.com"
 
-MLFLOW_ARTIFACT_URI = os.getenv("ARTIFACT_STORE_URI")
+ARTIFACT_STORE_URI = os.getenv("ARTIFACT_STORE_URI")
 
-print(f"🔍 ARTIFACT_STORE_URI: {MLFLOW_ARTIFACT_URI}")
+
 
 #══════════════════════════════════════════════════════════════════════════════════════
 #════════════════════════════════ PREPARATION DES DONNES ══════════════════════════════
@@ -112,7 +112,7 @@ test_f1 = f1_score(Y_test, y_test_pred)
 #══════════════════════════════════════════════════════════════════════════════════════
 #═══════════════════════ ENREGISTREMENT SUR MLFLOW ════════════════════════════════════
 #══════════════════════════════════════════════════════════════════════════════════════
-mlflow.set_experiment("AI_vs_Human_Classification")
+mlflow.set_experiment("AI")
 
 with mlflow.start_run(run_name="VotingClassifier_Best"):
 

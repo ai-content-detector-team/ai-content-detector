@@ -9,3 +9,4 @@ transformers
 scikit-learn
 xgboost
 mlflow
+boto3
