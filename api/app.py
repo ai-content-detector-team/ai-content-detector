@@ -29,7 +29,7 @@ L'**AI Review Detector API** est une solution professionnelle de détection auto
 
 ### 🎯 Objectif
 
-Cette API permet d'identifier si un avis client ou une critique a été rédigé par un humain ou généré par une intelligence artificielle, 
+Cette API permet d'identifier si un avis client a été rédigé par un humain ou généré par une intelligence artificielle, 
 aidant ainsi les entreprises à maintenir l'authenticité de leurs plateformes d'évaluation.
 
 ### 🔬 Modèle de détection
@@ -238,12 +238,14 @@ def detect_connectives(text, len_word_value):
     """
     Détecte les connecteurs logiques.
     """
-    text_lower = text.lower()
-    detected = defaultdict(int)
+    doc = nlp(text.lower())
+    words = [tok.text for tok in doc if is_word_tok(tok)]
+    text_joined = ' '.join(words).lower()
 
+    detected = defaultdict(int)
     for category, phrases in connectives.items():
         for phrase in phrases:
-            if phrase in text_lower:
+            if phrase in text_joined:
                 detected[category] += 1
 
     #Convertir en ratio
@@ -281,7 +283,27 @@ def preprocessor(text):
     
     features = {}
 
-    #Traitement avec Spacy
+    # === 1. Features BERT ===
+    bert_wp = tokenizer.tokenize(text)
+    features['bert_wp_len'] = len(bert_wp)
+
+    bert_ids = tokenizer.encode(text, add_special_tokens=True)
+    features['bert_ids_len'] = len(bert_ids)
+
+    bert_words = []
+    current = ""
+    for tok in bert_wp:
+        if tok.startswith('##'):
+            current += tok[2:]
+        else:
+            if current:
+                bert_words.append(current)
+            current = tok
+    if current:
+        bert_words.append(current)
+    features['bert_words_len'] = len(bert_words)
+
+    # === 2. Traitement avec Spacy ===
     doc = nlp(text)
     tokens = list(doc)
 
@@ -289,7 +311,7 @@ def preprocessor(text):
     valid_words = [tok for tok in tokens if is_word_tok(tok)]
     len_words = max(len(valid_words), 1) #Eviter les divisions par 0
 
-    # === 1. Features de longueur ===
+    # === 3. Features de longueur ===
     features['len_chars'] = len(text)
     features['len_tokens_all'] = len(tokens)
     features['len_words'] = len_words
@@ -305,26 +327,22 @@ def preprocessor(text):
     features['len_chars_per_word'] = features['len_chars'] / len_words
     features['len_tokens_per_word'] = features['len_tokens_all'] /len_words
 
-    # === 2. Ratios majuscules ===
-    nb_uppercase = sum(1 for c in text if c.isupper())
-    features['freq_uppercase'] = nb_uppercase / max(len(text), 1)
-
-    # === 3. Features de ponctuation ===
+    # === 4. Features de ponctuation ===
     punct_features = punctuation_features(text, len_words)
     features.update(punct_features)
 
-    # === 4. Ratio stopwords ===
+    # === 5. Ratio stopwords ===
     stopword_count = sum(1 for tok in valid_words if tok.text.lower() in stop_en)
     features['stopwords_ratio'] = stopword_count / len_words
 
-    # === 5. Connecteurs logiques ===
+    # === 6. Connecteurs logiques ===
     connective_features = detect_connectives(text, len_words)
     #Ajouter toutes les catégories (même si 0)
     for cat in connectives.keys():
         key = f"connective_{cat}_ratio"
         features[key] = connective_features.get(key, 0.0)
 
-    # === 6. POS tags ===
+    # === 7. POS tags ===
     pos_feat = pos_features(doc, len_words)
     features.update(pos_feat)
 

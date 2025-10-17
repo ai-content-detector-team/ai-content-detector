@@ -27,7 +27,7 @@ ARTIFACT_STORE_URI = os.getenv("ARTIFACT_STORE_URI")
 #══════════════════════════════════════════════════════════════════════════════════════
 #════════════════════════════════ PREPARATION DES DONNES ══════════════════════════════
 #══════════════════════════════════════════════════════════════════════════════════════
-df = pd.read_csv("../datasets_source/features_compilation_ml.csv")
+df = pd.read_csv("../datasets_source/features_ia_vs_humain_ml.csv")
 for col in ["classe", "SYM"]:
     if col in df.columns:
         df = df.drop(columns=[col])
